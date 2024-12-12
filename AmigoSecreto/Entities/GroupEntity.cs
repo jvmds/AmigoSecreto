@@ -1,10 +1,9 @@
 ﻿namespace AmigoSecreto.Entities;
 
-public class GroupEntity
+public class GroupEntity : BaseEntity
 {
-    public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
 
-    public ISet<UserEntity> Users { get; set; } = new HashSet<UserEntity>();
+    public ISet<UserGroupEntity> UsersGroups { get; set; } = new HashSet<UserGroupEntity>();
 }

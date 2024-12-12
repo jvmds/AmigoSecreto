@@ -9,9 +9,14 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
         builder
-            .HasOne(u => u.SecretSanta)
-            .WithOne()
-            .HasForeignKey<UserEntity>(u => u.SecretSantaId)
+            .HasMany(u => u.UsersGroups)
+            .WithOne(j => j.User)
+            .HasForeignKey(j => j.UserId)
+            .IsRequired(true);
+        builder
+            .HasMany<UserGroupEntity>()
+            .WithOne(j => j.SecretSanta)
+            .HasForeignKey(j => j.SecretSantaId)
             .IsRequired(false);
         builder
             .Property(u => u.Email)
@@ -22,5 +27,8 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder
             .Property(u => u.LestName)
             .HasMaxLength(50);
+        builder
+            .Property(e => e.DateTimeCreation)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
     }
 }

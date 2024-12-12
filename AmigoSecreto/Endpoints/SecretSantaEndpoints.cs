@@ -40,7 +40,7 @@ public static class SecretSantaEndpoints
                             }
                             
                             var userEntity = _mapper.Map<UserEntity>(userInputDto);
-                            userEntity.Group = groupEntity;
+                            //userEntity.Group = groupEntity;
                             await _amigoSecretoContext.User.AddAsync(userEntity);
                             await _amigoSecretoContext.SaveChangesAsync();
                             
@@ -61,17 +61,18 @@ public static class SecretSantaEndpoints
                         {
                             var groupEntity = await _amigoSecretoContext
                                             .Groups
-                                            .Include(g => g.Users)
+                                            //.Include(g => g.Users)
                                             .FirstOrDefaultAsync(g => g.Id == groupId);
                             if (groupEntity is null)
                             {
                                 Results.NotFound();
                             }
-                            
+
                             var random = new Random();
-                            var users = groupEntity!.Users.ToList();
-                            var ids = new List<int>();
-                            
+                        }
+                            //var users = null groupEntity!.Users.ToList();
+                            //var ids = new List<int>();
+                            /*
                             foreach (var currentUser in users)
                             {
                                 List<UserEntity> remainingUsers;
@@ -96,7 +97,7 @@ public static class SecretSantaEndpoints
                                 
                                 var positionOfTheDrawnFriend = random.Next(remainingUsers.Count);
                                 var secretSanta = remainingUsers[positionOfTheDrawnFriend];
-                                currentUser.SecretSanta = secretSanta;
+                                //currentUser.SecretSanta = secretSanta;
                                 ids.Add(secretSanta.Id);
                                 _amigoSecretoContext.User.Update(currentUser);
                                 await _amigoSecretoContext.SaveChangesAsync();
@@ -113,13 +114,14 @@ public static class SecretSantaEndpoints
                                         Summary = "Sortear integrantes",
                                         Description = "Realiza o sorteio dos integrantes do grupo",
                                         Tags = [new OpenApiTag { Name = "Amigo Oculto" }]
-                        });
+                        }
+                            */);
         
         app.MapGet("/groups/{groupId:int}", async (int groupId, AmigoSecretoContext _amigoSecretoContext, IMapper _mapper) =>
                         {
                             var groupEntity = await _amigoSecretoContext
                                             .Groups
-                                            .Include(g => g.Users)
+                                            //.Include(g => g.Users)
                                             .FirstOrDefaultAsync(g => g.Id == groupId);
                             if (groupEntity is null)
                             {

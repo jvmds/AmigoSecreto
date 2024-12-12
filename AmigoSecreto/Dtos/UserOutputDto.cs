@@ -1,6 +1,4 @@
-﻿using AmigoSecreto.Entities;
-
-namespace AmigoSecreto.Dtos;
+﻿namespace AmigoSecreto.Dtos;
 
 public class UserOutputDto
 {
@@ -8,8 +6,7 @@ public class UserOutputDto
     public string FirstName { get; set; } = null!;
     public string LestName { get; set; } = null!;
     public string Email { get; set; } = null!;
-    
-    //public GroupOutputDto Group { get; set; } = null!;
-    public UserOutputDto? SecretSanta { get; set; }
+
+    public ISet<GroupOutputDto> Groups { get; set; } = new HashSet<GroupOutputDto>();
     
 }
