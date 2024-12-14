@@ -11,67 +11,71 @@ public static class GroupEndpoints
 {
     public static WebApplication MapGroupEndpoints(this WebApplication app)
     {
-        app.MapPost("/groups", async (GroupInputDto groupInput, AmigoSecretoContext _amigoSecretoContext, IMapper _mapper) =>
-        {
-            var groupEntity = _mapper.Map<GroupEntity>(groupInput);
+        app.MapPost("/groups",
+                                        async (GroupInputDto groupInput, AmigoSecretoContext _amigoSecretoContext,
+                                                        IMapper _mapper) =>
+                                        {
+                                            var groupEntity = _mapper.Map<GroupEntity>(groupInput);
 
-            await _amigoSecretoContext.Groups.AddAsync(groupEntity);
-            await _amigoSecretoContext.SaveChangesAsync();
+                                            await _amigoSecretoContext.Groups.AddAsync(groupEntity);
+                                            await _amigoSecretoContext.SaveChangesAsync();
 
-            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
+                                            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
 
-            return Results.Created($"{groupEntity.Id}", groupOutputDto);
-        })
-            .Produces<GroupOutputDto>(StatusCodes.Status201Created)
-            .WithName("Criar grupo")
-            .WithOpenApi(x => new OpenApiOperation(x)
-            {
-                Summary = "Cria um novo grupo na base de dados",
-                Description = "Cria um novo grupo na base de dados",
-                Tags = [new OpenApiTag { Name = "Grupos" }]
-            });
-        
-        app.MapGet("/groups/{groupId:int}", async (int groupId, AmigoSecretoContext _amigoSecretoContext, IMapper _mapper) =>
-        {
-            var groupEntity = await _amigoSecretoContext
-                            .Groups
-                            .FirstOrDefaultAsync(g => g.Id == groupId);
-            if (groupEntity is null)
-            {
-                Results.NotFound();
-            }
+                                            return Results.Created($"{groupEntity.Id}", groupOutputDto);
+                                        })
+                        .Produces<GroupOutputDto>(StatusCodes.Status201Created)
+                        .WithName("Criar grupo")
+                        .WithOpenApi(x => new OpenApiOperation(x)
+                        {
+                                        Summary = "Cria um novo grupo na base de dados",
+                                        Description = "Cria um novo grupo na base de dados",
+                                        Tags = [new OpenApiTag { Name = "Grupos" }]
+                        });
 
-            var usersEntitiesIds = await _amigoSecretoContext
-            .UserGroups
-            .Where(u => u.GroupId == groupEntity!.Id)
-            .Select(u => u.UserId)
-            .ToHashSetAsync();
+        app.MapGet("/groups/{groupId:int}",
+                                        async (int groupId, AmigoSecretoContext _amigoSecretoContext,
+                                                        IMapper _mapper) =>
+                                        {
+                                            var groupEntity = await _amigoSecretoContext
+                                                            .Groups
+                                                            .FirstOrDefaultAsync(g => g.Id == groupId);
+                                            if (groupEntity is null)
+                                            {
+                                                Results.NotFound();
+                                            }
 
-            var usersEntities = new HashSet<UserEntity>();
+                                            var usersEntitiesIds = await _amigoSecretoContext
+                                                            .UserGroups
+                                                            .Where(u => u.GroupId == groupEntity!.Id)
+                                                            .Select(u => u.UserId)
+                                                            .ToHashSetAsync();
 
-            if (usersEntitiesIds.Count > 0)
-            {
-                usersEntities = await _amigoSecretoContext
-                .User
-                .Where(g => usersEntitiesIds.Contains(g.Id))
-                .ToHashSetAsync();
-            }
+                                            var usersEntities = new HashSet<UserEntity>();
 
-            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
-            groupOutputDto.Users = _mapper.Map<HashSet<UserOutputDto>>(usersEntities);
-            
-            return Results.Ok(groupOutputDto);
-        })
-        .Produces<GroupOutputDto>(StatusCodes.Status200OK)
-        .WithName("Busca por um grupo")
-        .WithOpenApi(x => new OpenApiOperation(x)
-        {
-                        Summary = "Busca por um grupo",
-                        Description = "Busca um grupo especifico pelo ID",
-                        Tags = [new OpenApiTag { Name = "Grupo" }]
-        }
-        );
-        
+                                            if (usersEntitiesIds.Count > 0)
+                                            {
+                                                usersEntities = await _amigoSecretoContext
+                                                                .User
+                                                                .Where(g => usersEntitiesIds.Contains(g.Id))
+                                                                .ToHashSetAsync();
+                                            }
+
+                                            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
+                                            groupOutputDto.Users = _mapper.Map<HashSet<UserOutputDto>>(usersEntities);
+
+                                            return Results.Ok(groupOutputDto);
+                                        })
+                        .Produces<GroupOutputDto>(StatusCodes.Status200OK)
+                        .WithName("Buscar por um grupo")
+                        .WithOpenApi(x => new OpenApiOperation(x)
+                        {
+                                        Summary = "Buscar por um grupo",
+                                        Description = "Buscar um grupo especifico pelo ID",
+                                        Tags = [new OpenApiTag { Name = "Grupos" }]
+                        });
+
+
         return app;
     }
 }

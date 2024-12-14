@@ -7,6 +7,6 @@ builder.AddServices();
 var app = builder.Build();
 
 app.UseArchitecture();
-app.MapSecretSantaEndpoints();
+//app.MapSecretSantaEndpoints();
 
 app.Run();

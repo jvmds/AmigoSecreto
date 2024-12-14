@@ -12,5 +12,6 @@ public class MappingProfile : Profile
         CreateMap<GroupEntity, GroupOutputDto>();
         CreateMap<UserInputDto, UserEntity>();
         CreateMap<UserEntity, UserOutputDto>();
+        CreateMap<UserGroupEntity, UserGroupOutputDto>();
     }
 }
