@@ -97,7 +97,7 @@ namespace AmigoSecreto.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SecretSantaId")
+                    b.Property<int?>("SecretSantaId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")

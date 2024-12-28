@@ -8,10 +8,10 @@ public class MappingProfile : Profile
 {
     public MappingProfile() 
     {
-        CreateMap<GroupInputDto, GroupEntity>();
-        CreateMap<GroupEntity, GroupOutputDto>();
-        CreateMap<UserInputDto, UserEntity>();
-        CreateMap<UserEntity, UserOutputDto>();
-        CreateMap<UserGroupEntity, UserGroupOutputDto>();
+        CreateMap<GroupInputDto, GroupEntity>().ReverseMap();
+        CreateMap<GroupEntity, GroupOutputDto>().ReverseMap();
+        CreateMap<UserInputDto, UserEntity>().ReverseMap();
+        CreateMap<UserEntity, UserOutputDto>().ReverseMap();
+        CreateMap<UserGroupEntity, UserGroupOutputDto>().ReverseMap();
     }
 }

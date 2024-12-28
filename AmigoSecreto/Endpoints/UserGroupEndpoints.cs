@@ -36,10 +36,20 @@ public static class UserGroupEndpoints
                                                                   .UserGroups
                                                                   .FirstOrDefaultAsync(u =>
                                                                                   u.GroupId == userGroupDto.GroupId
-                                                                                  && u.UserId == userGroupDto.UserId)
-                                                  ?? new UserGroupEntity { User = userEntity, Group = groupEntity };
+                                                                                  && u.UserId == userGroupDto.UserId);
+                            if (userGroupEntity is null)
+                            {
+                                userGroupEntity = new UserGroupEntity { User = userEntity, Group = groupEntity };
+                                await _amigoSecretoContext.UserGroups.AddAsync(userGroupEntity);
+                                await _amigoSecretoContext.SaveChangesAsync();
+                            }
 
-                            var userGroupOutputDto = _mapper.Map<UserGroupOutputDto>(userGroupEntity);
+                            var userGroupOutputDto = new UserGroupOutputDto()
+                            {
+                                            User = _mapper.Map<UserInputDto>(userEntity),
+                                            Group = _mapper.Map<GroupInputDto>(groupEntity), Id = userGroupEntity.Id,
+                                            SecretSanta = null
+                            };
 
                             return Results.Created($"{userGroupOutputDto.Id}", userGroupOutputDto);
                         })
@@ -145,11 +155,11 @@ public static class UserGroupEndpoints
                                             return Results.Ok(userGroupOutputDto);
                                         })
                         .Produces<UserGroupOutputDto>()
-                        .WithName("Vincular amigo secreto")
+                        .WithName("Obter amigo secreto")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {
-                                        Summary = "Vincular amigo secreto",
-                                        Description = "Vincula o amigo secreto de um usuário",
+                                        Summary = "Obteramigo secreto",
+                                        Description = "Obter o amigo secreto de um usuário",
                                         Tags = [new OpenApiTag { Name = "Amigo Oculto" }]
                         });
 
@@ -181,16 +191,18 @@ public static class UserGroupEndpoints
                                             foreach (var userGroupEntity in userGroupEntityList)
                                             {
                                                 var usersIds = userGroupEntityList
+                                                                .Where(u => u.UserId != userGroupEntity.UserId 
+                                                                            && !alreadySelectedUsersIds.Contains(u.UserId))
                                                                 .Select(u => u.UserId)
-                                                                .ToHashSet();
-                                                usersIds.Remove(userGroupEntity.UserId);
-                                                usersIds.ExceptWith(alreadySelectedUsersIds);
-                                                var id = random.Next(usersIds.Count);
+                                                                .ToList();
+                                                //usersIds.Remove(userGroupEntity.UserId);
+                                                //usersIds.ExceptWith(alreadySelectedUsersIds);
+                                                var id = usersIds[random.Next(usersIds.Count)];
                                                 userGroupEntity.SecretSanta = usersEntity.First(u => u.Id == id);
 
                                                 _amigoSecretoContext.UserGroups.Update(userGroupEntity);
                                                 alreadySelectedUsersIds.Add(id);
-
+                                                
                                                 userSecretSanta.Add(new UserSecretSantaOutputDto()
                                                 {
                                                                 FirstName = userGroupEntity.User.FirstName,
@@ -208,7 +220,8 @@ public static class UserGroupEndpoints
                                                 });
                                             }
 
-
+                                            await _amigoSecretoContext.SaveChangesAsync();
+                                            
                                             return Results.Ok(new UserGroupSecretSantaOutputDto()
                                             {
                                                             Group = new GroupInputDto()

@@ -2,6 +2,7 @@
 using AmigoSecreto.Dtos;
 using AmigoSecreto.Entities;
 using AutoMapper;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -12,19 +13,27 @@ public static class GroupEndpoints
     public static WebApplication MapGroupEndpoints(this WebApplication app)
     {
         app.MapPost("/groups",
-                                        async (GroupInputDto groupInput, AmigoSecretoContext _amigoSecretoContext,
-                                                        IMapper _mapper) =>
+                                        async (GroupInputDto groupInput, AmigoSecretoContext amigoSecretoContext,
+                                                        IMapper mapper, IValidator<GroupInputDto> validator) =>
                                         {
-                                            var groupEntity = _mapper.Map<GroupEntity>(groupInput);
+                                            if (!validator.Validate(groupInput).IsValid)
+                                            {
+                                                return Results.BadRequest(ErrorDto.CreatedError400(validator.Validate(groupInput).Errors));
+                                            }
+                                                
+                                            var groupEntity = mapper.Map<GroupEntity>(groupInput);
 
-                                            await _amigoSecretoContext.Groups.AddAsync(groupEntity);
-                                            await _amigoSecretoContext.SaveChangesAsync();
+                                            await amigoSecretoContext.Groups.AddAsync(groupEntity);
+                                            await amigoSecretoContext.SaveChangesAsync();
 
-                                            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
+                                            var groupOutputDto = mapper.Map<GroupOutputDto>(groupEntity);
 
                                             return Results.Created($"{groupEntity.Id}", groupOutputDto);
+
                                         })
                         .Produces<GroupOutputDto>(StatusCodes.Status201Created)
+                        .Produces<ErrorDto>(StatusCodes.Status400BadRequest)
+                        .Produces<ErrorDto>(StatusCodes.Status500InternalServerError)
                         .WithName("Criar grupo")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {
@@ -42,7 +51,7 @@ public static class GroupEndpoints
                                                             .FirstOrDefaultAsync(g => g.Id == groupId);
                                             if (groupEntity is null)
                                             {
-                                                Results.NotFound();
+                                                return Results.NotFound(ErrorDto.CreatedError404());
                                             }
 
                                             var usersEntitiesIds = await _amigoSecretoContext
@@ -66,7 +75,9 @@ public static class GroupEndpoints
 
                                             return Results.Ok(groupOutputDto);
                                         })
-                        .Produces<GroupOutputDto>(StatusCodes.Status200OK)
+                        .Produces<GroupOutputDto>()
+                        .Produces<ErrorDto>(StatusCodes.Status404NotFound)
+                        .Produces<ErrorDto>(StatusCodes.Status500InternalServerError)
                         .WithName("Buscar por um grupo")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {

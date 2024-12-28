@@ -11,5 +11,8 @@ public class UserGroupConfiguration : IEntityTypeConfiguration<UserGroupEntity>
         builder
             .Property(e => e.DateTimeCreation)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder
+                        .Property(e => e.SecretSantaId)
+                        .IsRequired(false);
     }
 }

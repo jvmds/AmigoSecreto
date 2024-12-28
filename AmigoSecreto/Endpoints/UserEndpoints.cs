@@ -41,7 +41,7 @@ public static class UserEndpoints
                                                             .FirstOrDefaultAsync(g => g.Id == userId);
                                             if (userEntity is null)
                                             {
-                                                Results.NotFound();
+                                                return Results.NotFound();
                                             }
 
                                             var groupsEntitiesIds = await _amigoSecretoContext
@@ -71,7 +71,7 @@ public static class UserEndpoints
                                         {
                                                         Summary = "Busca por um usuário",
                                                         Description = "Busca um usuário especifico pelo ID",
-                                                        Tags = [new OpenApiTag { Name = "Usuário" }]
+                                                        Tags = [new OpenApiTag { Name = "Usuários" }]
                                         }
                         );
 
