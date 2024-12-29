@@ -14,11 +14,14 @@ public static class GroupEndpoints
     {
         app.MapPost("/groups",
                                         async (GroupInputDto groupInput, AmigoSecretoContext amigoSecretoContext,
-                                                        IMapper mapper, IValidator<GroupInputDto> validator) =>
+                                                        IMapper mapper, 
+                                                        IValidator<GroupInputDto> validator,
+                                                        IConfiguration configuration) =>
                                         {
-                                            if (!validator.Validate(groupInput).IsValid)
+                                            var validate = await validator.ValidateAsync(groupInput);
+                                            if (!validate.IsValid)
                                             {
-                                                return Results.BadRequest(ErrorDto.CreatedError400(validator.Validate(groupInput).Errors));
+                                                return Results.BadRequest(ErrorDto.CreatedError400(validate.Errors));
                                             }
                                                 
                                             var groupEntity = mapper.Map<GroupEntity>(groupInput);
@@ -28,7 +31,7 @@ public static class GroupEndpoints
 
                                             var groupOutputDto = mapper.Map<GroupOutputDto>(groupEntity);
 
-                                            return Results.Created($"{groupEntity.Id}", groupOutputDto);
+                                            return Results.Created($"{configuration["BaseUri"]}/groups/{groupEntity.Id}", groupOutputDto);
 
                                         })
                         .Produces<GroupOutputDto>(StatusCodes.Status201Created)
@@ -37,16 +40,16 @@ public static class GroupEndpoints
                         .WithName("Criar grupo")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {
-                                        Summary = "Cria um novo grupo na base de dados",
+                                        Summary = "Cria um novo grupo",
                                         Description = "Cria um novo grupo na base de dados",
                                         Tags = [new OpenApiTag { Name = "Grupos" }]
                         });
 
         app.MapGet("/groups/{groupId:int}",
-                                        async (int groupId, AmigoSecretoContext _amigoSecretoContext,
-                                                        IMapper _mapper) =>
+                                        async (int groupId, AmigoSecretoContext amigoSecretoContext,
+                                                        IMapper mapper) =>
                                         {
-                                            var groupEntity = await _amigoSecretoContext
+                                            var groupEntity = await amigoSecretoContext
                                                             .Groups
                                                             .FirstOrDefaultAsync(g => g.Id == groupId);
                                             if (groupEntity is null)
@@ -54,7 +57,7 @@ public static class GroupEndpoints
                                                 return Results.NotFound(ErrorDto.CreatedError404());
                                             }
 
-                                            var usersEntitiesIds = await _amigoSecretoContext
+                                            var usersEntitiesIds = await amigoSecretoContext
                                                             .UserGroups
                                                             .Where(u => u.GroupId == groupEntity!.Id)
                                                             .Select(u => u.UserId)
@@ -64,14 +67,14 @@ public static class GroupEndpoints
 
                                             if (usersEntitiesIds.Count > 0)
                                             {
-                                                usersEntities = await _amigoSecretoContext
+                                                usersEntities = await amigoSecretoContext
                                                                 .User
                                                                 .Where(g => usersEntitiesIds.Contains(g.Id))
                                                                 .ToHashSetAsync();
                                             }
 
-                                            var groupOutputDto = _mapper.Map<GroupOutputDto>(groupEntity);
-                                            groupOutputDto.Users = _mapper.Map<HashSet<UserOutputDto>>(usersEntities);
+                                            var groupOutputDto = mapper.Map<GroupOutputDto>(groupEntity);
+                                            groupOutputDto.Users = mapper.Map<HashSet<UserOutputDto>>(usersEntities);
 
                                             return Results.Ok(groupOutputDto);
                                         })
@@ -81,8 +84,8 @@ public static class GroupEndpoints
                         .WithName("Buscar por um grupo")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {
-                                        Summary = "Buscar por um grupo",
-                                        Description = "Buscar um grupo especifico pelo ID",
+                                        Summary = "Busca por um grupo",
+                                        Description = "Busca por um grupo na base de dados usando como chave o ID",
                                         Tags = [new OpenApiTag { Name = "Grupos" }]
                         });
 

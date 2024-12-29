@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AmigoSecreto.Migrations
 {
     [DbContext(typeof(AmigoSecretoContext))]
-    [Migration("20241212025624_InitialCreate")]
+    [Migration("20241229025300_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -100,7 +100,7 @@ namespace AmigoSecreto.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SecretSantaId")
+                    b.Property<int?>("SecretSantaId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")

@@ -51,7 +51,7 @@ namespace AmigoSecreto.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SecretSantaId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SecretSantaId = table.Column<int>(type: "INTEGER", nullable: true),
                     GroupId = table.Column<int>(type: "INTEGER", nullable: false),
                     DateTimeCreation = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     DateTimeUpdate = table.Column<DateTime>(type: "TEXT", nullable: false)

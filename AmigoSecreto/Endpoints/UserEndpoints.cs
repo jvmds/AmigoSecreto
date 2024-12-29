@@ -2,6 +2,7 @@
 using AmigoSecreto.Dtos;
 using AmigoSecreto.Entities;
 using AutoMapper;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -12,23 +13,33 @@ public static class UserEndpoints
     public static WebApplication MapUserEndpoints(this WebApplication app)
     {
         app.MapPost("/users",
-                                        async (UserInputDto userInput, AmigoSecretoContext _amigoSecretoContext,
-                                                        IMapper _mapper) =>
+                                        async (UserInputDto userInput, AmigoSecretoContext amigoSecretoContext,
+                                                        IMapper mapper, 
+                                                        IValidator<UserInputDto> validator,
+                                                        IConfiguration configuration) =>
                                         {
-                                            var userEntity = _mapper.Map<UserEntity>(userInput);
+                                            var validate = await validator.ValidateAsync(userInput);
+                                            if (!validate.IsValid)
+                                            {
+                                                return Results.BadRequest(ErrorDto.CreatedError400(validate.Errors));
+                                            }
 
-                                            await _amigoSecretoContext.User.AddAsync(userEntity);
-                                            await _amigoSecretoContext.SaveChangesAsync();
+                                            var userEntity = mapper.Map<UserEntity>(userInput);
 
-                                            var userOutputDto = _mapper.Map<UserOutputDto>(userEntity);
+                                            await amigoSecretoContext.User.AddAsync(userEntity);
+                                            await amigoSecretoContext.SaveChangesAsync();
 
-                                            return Results.Created($"{userEntity.Id}", userOutputDto);
+                                            var userOutputDto = mapper.Map<UserOutputDto>(userEntity);
+
+                                            return Results.Created($"{configuration["BaseUri"]}/users/{userEntity.Id}", userOutputDto);
                                         })
                         .Produces<UserOutputDto>(StatusCodes.Status201Created)
+                        .Produces<ErrorDto>(StatusCodes.Status400BadRequest)
+                        .Produces<ErrorDto>(StatusCodes.Status500InternalServerError)
                         .WithName("Criar usuário")
                         .WithOpenApi(x => new OpenApiOperation(x)
                         {
-                                        Summary = "Cria um novo usuário na base de dados",
+                                        Summary = "Cria um novo usuário",
                                         Description = "Cria um novo usuário na base de dados",
                                         Tags = [new OpenApiTag { Name = "Usuários" }]
                         });
@@ -41,8 +52,7 @@ public static class UserEndpoints
                                                             .FirstOrDefaultAsync(g => g.Id == userId);
                                             if (userEntity is null)
                                             {
-                                                //return Results.NotFound();
-                                                Results.NotFound();
+                                                return Results.NotFound(ErrorDto.CreatedError404());
                                             }
 
                                             var groupsEntitiesIds = await _amigoSecretoContext
@@ -67,11 +77,13 @@ public static class UserEndpoints
                                             return Results.Ok(userOutputDto);
                                         })
                         .Produces<UserOutputDto>(StatusCodes.Status200OK)
-                        .WithName("Busca por um usuário")
+                        .Produces<ErrorDto>(StatusCodes.Status404NotFound)
+                        .Produces<ErrorDto>(StatusCodes.Status500InternalServerError)
+                        .WithName("Busca um usuário")
                         .WithOpenApi(x => new OpenApiOperation(x)
                                         {
                                                         Summary = "Busca por um usuário",
-                                                        Description = "Busca um usuário especifico pelo ID",
+                                                        Description = "Busca por um usuário na base de dados usando como chave o ID",
                                                         Tags = [new OpenApiTag { Name = "Usuários" }]
                                         }
                         );

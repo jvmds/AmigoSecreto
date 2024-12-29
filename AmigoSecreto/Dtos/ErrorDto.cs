@@ -44,7 +44,19 @@ public class ErrorDto
                                         : [],
         };
     }
-    
+
+    public static ErrorDto CreatedError400(string description)
+    {
+        return new ErrorDto
+        {
+            Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1",
+            Status = HttpStatusCode.BadRequest,
+            Title = "Bad Request",
+            Detail = description,
+            MoreDetails = [],
+        };
+    }
+
     public static ErrorDto CreatedError404(ICollection<ValidationFailure>? moreDetails = null)
     {
         return new ErrorDto
@@ -63,8 +75,19 @@ public class ErrorDto
                                         : [],
         };
     }
-    //https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1
-    
+
+    public static ErrorDto CreatedError500()
+    {
+        return new ErrorDto
+        {
+            Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1",
+            Status = HttpStatusCode.InternalServerError,
+            Title = "Internal Server Error",
+            Detail = "Encontramos problemas ao processar a solicitação.",
+            MoreDetails = [],
+        };
+    }
+
     public string Type { get; set; }
     public string Title { get; set; }
     public string Detail { get; set; }
