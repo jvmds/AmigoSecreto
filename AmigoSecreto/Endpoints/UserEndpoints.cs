@@ -41,7 +41,8 @@ public static class UserEndpoints
                                                             .FirstOrDefaultAsync(g => g.Id == userId);
                                             if (userEntity is null)
                                             {
-                                                return Results.NotFound();
+                                                //return Results.NotFound();
+                                                Results.NotFound();
                                             }
 
                                             var groupsEntitiesIds = await _amigoSecretoContext

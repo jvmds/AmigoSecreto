@@ -63,6 +63,8 @@ public class ErrorDto
                                         : [],
         };
     }
+    //https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1
+    
     public string Type { get; set; }
     public string Title { get; set; }
     public string Detail { get; set; }
