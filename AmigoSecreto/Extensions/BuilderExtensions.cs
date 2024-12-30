@@ -1,4 +1,5 @@
 using AmigoSecreto.Context;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace AmigoSecreto.Extensions;
@@ -11,6 +12,7 @@ public static class BuilderExtensions
         builder.Services.AddSwaggerGen();
         builder.AddDbContext();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
         return builder;
     }

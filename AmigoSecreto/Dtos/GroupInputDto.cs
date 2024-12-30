@@ -1,4 +1,5 @@
-﻿using AmigoSecreto.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using AmigoSecreto.Entities;
 
 namespace AmigoSecreto.Dtos;
 
