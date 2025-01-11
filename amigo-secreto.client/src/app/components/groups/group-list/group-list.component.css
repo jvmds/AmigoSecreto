@@ -1,0 +1,18 @@
+.left-text {
+  flex: 1;
+  text-align: left;
+}
+
+.right-menu-btn {
+  position: absolute;
+  right: 16px;
+}
+
+.mat-menu-panel {
+  right: 0 !important;
+  left: unset !important;
+}
+
+.mat-mdc-list-item-icon {
+  color: rgba(0, 0, 0, 0.54);
+}
