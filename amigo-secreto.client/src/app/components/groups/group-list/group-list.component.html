@@ -1,20 +1,5 @@
-<mat-grid-list cols="1" rowHeight="5:1">
+<mat-grid-list cols="1" rowHeight="2:1">
   @if(group$ | async; as group){
-    <mat-list>
-      <mat-list-item>
-        <mat-icon matListItemIcon>group</mat-icon>
-        <div class="left-text" matListItemTitle>{{group.name}}</div>
-        <div class="left-text" matListItemLine>{{group.description}}</div>
-        <button mat-icon-button [matMenuTriggerFor]="menu" class="right-menu-btn">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-      </mat-list-item>
-    </mat-list>
-
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item>Item 1</button>
-      <button mat-menu-item>Item 2</button>
-      <button mat-menu-item>Item 3</button>
-    </mat-menu>
+   <app-list-menu-item [group]="group"></app-list-menu-item>
   }
 </mat-grid-list>

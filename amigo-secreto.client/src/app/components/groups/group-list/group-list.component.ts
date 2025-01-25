@@ -10,6 +10,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import {AsyncPipe} from '@angular/common';
 import {Group} from '../../../models/group';
+import {ListMenuItemComponent} from '../../common/list-menu-item/list-menu-item.component';
 
 
 @Component({
@@ -23,6 +24,7 @@ import {Group} from '../../../models/group';
     MatListModule,
     MatDividerModule,
     AsyncPipe,
+    ListMenuItemComponent,
   ],
   templateUrl: './group-list.component.html',
   styleUrl: './group-list.component.css'

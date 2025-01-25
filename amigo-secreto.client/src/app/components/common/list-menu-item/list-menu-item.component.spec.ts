@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ListMenuItemComponent } from './list-menu-item.component';
+
+describe('ListMenuItemComponent', () => {
+  let component: ListMenuItemComponent;
+  let fixture: ComponentFixture<ListMenuItemComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ListMenuItemComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ListMenuItemComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
