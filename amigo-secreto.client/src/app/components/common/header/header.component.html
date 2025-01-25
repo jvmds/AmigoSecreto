@@ -1,9 +1,11 @@
 <mat-toolbar>
-  <button mat-icon-button (click)="clickOnMenuButton()"  aria-label="Amigo Secreto">
-    <mat-icon>menu</mat-icon>
+  <button mat-icon-button (click)="sidenav.toggle()"  aria-label="Amigo Secreto">
+    <mat-icon>
+      {{sidenav.opened ? 'close' : 'menu'}}
+    </mat-icon>
   </button>
-  <span>Amigo Secreto</span>
-  <span class="spacer"></span>
+  <span class="margin-left">Amigo Secreto</span>
+  <span class="horizontal-spacer"></span>
   <button mat-icon-button aria-label="Example icon-button with heart icon">
     <mat-icon>favorite</mat-icon>
   </button>
@@ -11,3 +13,49 @@
     <mat-icon>share</mat-icon>
   </button>
 </mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav
+    #sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    fixedTopGap="56">
+    <div class="margin-top">
+      @if (products$ | async; as products){
+        <mat-tree #tree [dataSource]="products" [childrenAccessor]="childrenAccessor">
+          <!-- This is the tree node template for leaf nodes -->
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+            <!-- use a disabled button to provide padding for tree leaf -->
+            <button mat-icon-button disabled>
+              @if (node.icon){
+                <mat-icon>{{node.icon}}</mat-icon>
+              }
+            </button>
+            @if(node.path){
+              <a mat-button routerLink="{{node.path}}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ node.name | capitalize }}</a>
+            } @else {
+              <a mat-button>{{ node.name | capitalize }}</a>
+            }
+          </mat-tree-node>
+          <!-- This is the tree node template for expandable nodes -->
+          <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
+                         [cdkTreeNodeTypeaheadLabel]="node.name">
+            <button mat-icon-button matTreeNodeToggle
+                    [attr.aria-label]="'Toggle ' + node.name">
+              <mat-icon>
+                {{tree.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            @if(node.path){
+              <a mat-button routerLink="{{node.path}}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ node.name | capitalize }}</a>
+            } @else {
+              <a mat-button>{{ node.name | capitalize }}</a>
+            }
+          </mat-tree-node>
+        </mat-tree>
+      }
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>
