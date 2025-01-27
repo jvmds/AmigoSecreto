@@ -1,0 +1,22 @@
+.main {
+  display: flex;
+  flex-direction: column; /* Alinha os elementos verticalmente */
+  height: 100vh; /* Altura de toda a viewport */
+  padding: 10px;
+  background: white;
+}
+.root-component {
+  display: grid;
+  grid-template-columns: 0.9fr 0.1fr;
+  place-items: center;
+  border: 2px solid #E0E0E0;
+  border-radius: 5px;
+  padding: 5px;
+  background: #E0E0E0;
+}
+
+.text-child-component {
+  align-self: start;
+  /*background-color: blueviolet;*/
+  width: 100%;
+}
